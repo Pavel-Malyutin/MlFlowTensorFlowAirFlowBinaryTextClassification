@@ -20,8 +20,8 @@ def get_batches(size):
 
     class Producer:
         def __init__(self):
-            self.kafka_host = os.environ.get("KAFKAHOST", "kafka1")
-            self.kafka_port = os.environ.get("KAFKAPORT", "9092")
+            self.kafka_host = "kafka1"
+            self.kafka_port = "19092"
             self.repo_host = os.environ.get("REPO_HOST", "host.docker.internal")
             self.repo_port = os.environ.get("REPO_PORT", "8182")
             self.producer = KafkaProducer(

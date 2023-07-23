@@ -18,8 +18,8 @@ def get_predictions(size):
     from kafka import KafkaConsumer
     import json
 
-    kafka_host = os.environ.get("KAFKA_HOST", "kafka1")
-    kafka_port = os.environ.get("KAFKA_PORT", "29092")
+    kafka_host = "kafka1"
+    kafka_port = "19092"
     repo_host = os.environ.get("REPO_HOST_", "host.docker.internal")
     repo_port = os.environ.get("REPO_PORT_", "8182")
     consumer = KafkaConsumer(

@@ -107,7 +107,7 @@ with DAG(dag_id='train_model', default_args=args, schedule_interval=None) as dag
         dag=dag,
         python_version=3.9,
         system_site_packages=True,
-        requirements=['scikit-learn', 'tensorflow', "mlflow", "pandas", "keras2onnx", "onnx"],
+        requirements=['scikit-learn==1.2.2', 'tensorflow==2.13.0', "mlflow", "pandas", "keras==2.13.1"],
         op_kwargs={"epochs": 10}
     )
     train_model

@@ -64,7 +64,7 @@ def train(epochs):
         train_df = df.sample(frac=0.8, random_state=100)
         test_df = df.drop(train_df.index)
 
-        mlflow.set_experiment(f"Reviews/{datetime.datetime.now().date()}")
+        # mlflow.set_experiment(f"Reviews/{datetime.datetime.now().date()}")
 
         artifacts_path = "artifacts"
         batch_size = 32
@@ -107,7 +107,7 @@ with DAG(dag_id='train_model', default_args=args, schedule_interval=None) as dag
         dag=dag,
         python_version=3.9,
         system_site_packages=True,
-        requirements=['scikit-learn==1.2.2', 'tensorflow==2.13.0', "mlflow", "pandas", "keras==2.13.1"],
-        op_kwargs={"epochs": 10}
+        requirements=['scikit-learn==1.2.2', 'tensorflow==2.13.0', "mlflow==2.5.0", "pandas", "keras==2.13.1"],
+        op_kwargs={"epochs": 1}
     )
     train_model

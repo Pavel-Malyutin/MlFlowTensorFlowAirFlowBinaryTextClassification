@@ -340,7 +340,19 @@ services:
     depends_on:
       - db
     command: tcp db:3306 -t 90s -i 250ms
-
+  inference:
+    build:
+      context: ./inference
+      dockerfile: Dockerfile
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_REGION}
+      - MLFLOW_S3_ENDPOINT_URL=${MLFLOW_S3_ENDPOINT_URL}
+      - MLFLOW_URL=http://mlflow:5000
+      - KAFKA_HOST=kafka1
+      - KAFKA_PORT=19092
+      - RUN_ID=23595d7f58054b719caa536e624e5b4b
 
 
 networks:

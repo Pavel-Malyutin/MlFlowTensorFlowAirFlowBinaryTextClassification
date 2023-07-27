@@ -1,0 +1,5 @@
+mlflow==2.5.0
+pandas==2.0.2
+tensorflow==2.13.0
+kafka-python==2.0.2
+boto3==1.28.10

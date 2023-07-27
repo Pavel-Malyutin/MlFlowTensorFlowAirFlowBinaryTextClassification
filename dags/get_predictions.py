@@ -20,8 +20,8 @@ def get_predictions(size):
 
     kafka_host = "kafka1"
     kafka_port = "19092"
-    repo_host = os.environ.get("REPO_HOST_", "host.docker.internal")
-    repo_port = os.environ.get("REPO_PORT_", "8182")
+    repo_host = os.environ.get("REPO_HOST", "host.docker.internal")
+    repo_port = os.environ.get("REPO_PORT", "8182")
     consumer = KafkaConsumer(
         bootstrap_servers=[f"{kafka_host}:{kafka_port}"],
         auto_offset_reset="earliest",
@@ -43,7 +43,8 @@ def get_predictions(size):
         consumer.close()
 
 
-with DAG(dag_id='get_predictions', default_args=args, schedule_interval="* * * * *") as dag:
+# with DAG(dag_id='get_predictions', default_args=args, schedule_interval="* * * * *") as dag:
+with DAG(dag_id='get_predictions', default_args=args, schedule_interval=None) as dag:
     transfer_predictions_from_db_to_kafka = PythonVirtualenvOperator(
         task_id='get_batches',
         python_callable=get_predictions,

@@ -1,12 +1,12 @@
-import tensorflow as tf
-import pandas as pd
 import json
-import pickle
-import mlflow
-import os
-from kafka import KafkaConsumer, KafkaProducer
 import multiprocessing
-from multiprocessing import Pool
+import os
+import pickle
+
+import mlflow
+import pandas as pd
+import tensorflow as tf
+from kafka import KafkaConsumer, KafkaProducer
 
 
 class Consumer:
@@ -58,7 +58,7 @@ class Producer:
 
 
 class Model:
-    def __init__(self, run_id: str = "91c96c4adb744784b53a59c7d34994fe"):
+    def __init__(self, run_id: str):
         self.__consumer = Consumer()
         self.__producer = Producer()
         self.__run_id = run_id
@@ -72,7 +72,7 @@ class Model:
         return tokenizer
 
     def __get_model(self):
-        model = mlflow.tensorflow.load_model(f'runs:/{self.__run_id}/model_name')
+        model = mlflow.tensorflow.load_model(f'runs:/{self.__run_id}/model')
         return model
 
     def run_loop(self):
@@ -93,16 +93,20 @@ class Model:
 
 
 if __name__ == '__main__':
-    model = Model()
-    model.run_loop()
-    # workers = multiprocessing.cpu_count() * 2
-    # processes = []
-    #
-    # for i in range(workers):
-    #     model = Model()
-    #     p = multiprocessing.Process(target=model.run_loop())
-    #     p.start()
-    #     processes.append(p)
-    #
-    # for p in processes:
-    #     p.join()
+
+    mlflow.set_tracking_uri(os.environ.get("MLFLOW_URL", ""))
+
+    # model = Model(run_id=os.environ.get("RUN_ID", ""))
+    # model.run_loop()
+
+    workers = multiprocessing.cpu_count() * 2
+    processes = []
+
+    for i in range(workers):
+        model = Model(run_id=os.environ.get("RUN_ID", ""))
+        p = multiprocessing.Process(target=model.run_loop())
+        p.start()
+        processes.append(p)
+
+    for p in processes:
+        p.join()

@@ -3,19 +3,19 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class Review(BaseModel):
+class Item(BaseModel):
     id: Optional[int]
     text: Optional[str]
-    sentiment: Optional[str]
+    label: Optional[str]
     status: Optional[str] = "New"
 
     class Config:
         orm_mode = True
 
 
-class TrainReview(BaseModel):
+class TrainItem(BaseModel):
     text: str
-    sentiment: str
+    label: str
 
     class Config:
         orm_mode = True

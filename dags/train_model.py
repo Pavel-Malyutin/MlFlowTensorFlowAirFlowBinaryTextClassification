@@ -36,7 +36,7 @@ def train(epochs):
 
     def get_tokenizer(data: pd.DataFrame, path: str):
         tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=8000)
-        tokenizer.fit_on_texts(data['review'].values)
+        tokenizer.fit_on_texts(data['text'].values)
         with open(f"{path}/tokenizer.pkl", "wb") as f:
             pickle.dump(tokenizer, f)
         return tokenizer
@@ -59,7 +59,7 @@ def train(epochs):
 
         df = pd.DataFrame.from_records(data).drop(["id"], axis=1)
 
-        df['sentiment'] = df['sentiment'].map({'positive': 0, 'negative': 1})
+        df['label'] = df['label'].map({'No': 0, 'Yes': 1})
 
         train_df = df.sample(frac=0.8, random_state=100)
         test_df = df.drop(train_df.index)
@@ -74,14 +74,14 @@ def train(epochs):
 
         tokenizer = get_tokenizer(df, artifacts_path)
 
-        train_seq = tokenizer.texts_to_sequences(train_df["review"])
-        test_seq = tokenizer.texts_to_sequences(test_df["review"])
+        train_seq = tokenizer.texts_to_sequences(train_df["text"])
+        test_seq = tokenizer.texts_to_sequences(test_df["text"])
 
         train_data = tf.keras.preprocessing.sequence.pad_sequences(train_seq, maxlen=100)
         test_data = tf.keras.preprocessing.sequence.pad_sequences(test_seq, maxlen=100)
 
-        train_label = train_df['sentiment'].values
-        test_label = test_df['sentiment'].values
+        train_label = train_df['label'].values
+        test_label = test_df['label'].values
         word_index = tokenizer.word_index
         nb_words = len(word_index) + 1
 
@@ -97,7 +97,7 @@ def train(epochs):
                   callbacks=call_back)
 
         log_artifacts(artifacts_path)
-        mlflow.tensorflow.log_model(model, "reviews")
+        mlflow.tensorflow.log_model(model, "texts")
 
 
 with DAG(dag_id='train_model', default_args=args, schedule_interval=None) as dag:

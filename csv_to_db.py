@@ -7,7 +7,7 @@ data = pd.read_csv('IMDBDataset.csv')
 train_df = data.sample(frac=0.9, random_state=100)
 
 test_df = data.drop(train_df.index)
-test_df["sentiment"] = ""
+test_df["label"] = ""
 test_df["status"] = "New"
 
 test_df.to_sql("production", engine, if_exists="replace", index_label="id")

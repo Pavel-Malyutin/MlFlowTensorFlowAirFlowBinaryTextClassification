@@ -81,12 +81,12 @@ class Model:
             if batch:
                 print("Start prediction")
                 df = pd.DataFrame.from_records(batch)
-                tokenized_text = self.__tokenizer.texts_to_sequences(df["review"])
+                tokenized_text = self.__tokenizer.texts_to_sequences(df["text"])
                 data = tf.keras.preprocessing.sequence.pad_sequences(tokenized_text, maxlen=500)
-                df["sentiment"] = self.__model.predict(data)
-                df = df.drop(["review"], axis=1)
-                df.loc[df['sentiment'] > 0, 'sentiment'] = "Negative"
-                df.loc[df['sentiment'] != "Negative", 'sentiment'] = "Positive"
+                df["label"] = self.__model.predict(data)
+                df = df.drop(["text"], axis=1)
+                df.loc[df['label'] < 0, 'label'] = "No"
+                df.loc[df['label'] != "No", 'label'] = "Yes"
                 self.__producer.send({"predictions": df.to_json()})
             else:
                 print("No data to process")

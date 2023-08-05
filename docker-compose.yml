@@ -352,7 +352,7 @@ services:
       - MLFLOW_URL=http://mlflow:5000
       - KAFKA_HOST=kafka1
       - KAFKA_PORT=19092
-      - RUN_ID=9987ae995dd141e0af813708190e171d
+      - MODEL_LIFETIME=${MODEL_LIFETIME}
 
 
 networks:

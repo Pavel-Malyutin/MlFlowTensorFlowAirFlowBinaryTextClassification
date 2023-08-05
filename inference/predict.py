@@ -1,7 +1,9 @@
+import datetime
 import json
 import multiprocessing
 import os
 import pickle
+import time
 
 import mlflow
 import pandas as pd
@@ -75,8 +77,9 @@ class Model:
         model = mlflow.tensorflow.load_model(f'runs:/{self.__run_id}/model')
         return model
 
-    def run_loop(self):
-        while True:
+    def run_loop(self, start: datetime):
+        lifetime = os.environ.get("MODEL_LIFETIME", "10")
+        while datetime.datetime.now() - start < datetime.timedelta(minutes=int(lifetime)):
             batch = self.__consumer()
             if batch:
                 print("Start prediction")
@@ -94,19 +97,51 @@ class Model:
 
 if __name__ == '__main__':
 
-    mlflow.set_tracking_uri(os.environ.get("MLFLOW_URL", ""))
+    mlflow.set_tracking_uri(os.environ.get("MLFLOW_URL", "http://localhost:5000"))
+    while True:
+        experiments = mlflow.search_experiments(view_type=1, order_by=["last_update_time DESC"])
+        if len(experiments) == 0:
+            print("No experiments found")
+            time.sleep(10)
+            continue
 
-    # model = Model(run_id=os.environ.get("RUN_ID", ""))
-    # model.run_loop()
+        runs = mlflow.search_runs([experiments[0].experiment_id], order_by=["created DESC"])
+        if runs.empty:
+            print("No runs found")
+            time.sleep(10)
+            continue
+        if len(runs) == 1 and runs.loc[0, 'status'] != 'FINISHED':
+            print("It is only one run and it is not in FINISHED status")
+            time.sleep(10)
+            continue
+        if len(runs) > 1 and runs.loc[0, 'status'] != 'FINISHED':
+            print("Last run is not in FINISHED status, trying to load another one")
+            run_id = None
+            for _, run in runs.iterrows():
+                if run['status'] == 'FINISHED':
+                    run_id = run['run_id']
+                    break
+            if not run_id:
+                print("No runs in FINISHED status")
+                time.sleep(10)
+                continue
+        else:
+            run_id = runs.loc[0, 'run_id']
 
-    workers = multiprocessing.cpu_count() * 2
-    processes = []
+        print("Get run: ", run_id)
 
-    for i in range(workers):
-        model = Model(run_id=os.environ.get("RUN_ID", ""))
-        p = multiprocessing.Process(target=model.run_loop())
-        p.start()
-        processes.append(p)
+        # model = Model(run_id=run_id)
+        # model.run_loop()
 
-    for p in processes:
-        p.join()
+        workers = multiprocessing.cpu_count() * 2
+        processes = []
+        start_time = datetime.datetime.now()
+
+        for i in range(workers):
+            model = Model(run_id=run_id)
+            p = multiprocessing.Process(target=model.run_loop(start=start_time))
+            p.start()
+            processes.append(p)
+
+        for p in processes:
+            p.join()

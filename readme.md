@@ -1,3 +1,6 @@
+![image](https://github.com/Pavel-Malyutin/MlFlowTensorFlowAirFlowBinaryTextClassification/assets/78384716/5106af18-4238-408b-9891-4e24f0394311)
+
+
 ## This service is made for binary text classification. 
 The are two datasets in this repository: positive and negative reviews and spam or non-spam emails. You can train a model on any of them.
 
